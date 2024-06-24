@@ -19,10 +19,7 @@
     "noImplicitAny": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["**/*.ts", "**/*.tsx", "src/server/*.ts"],
   // "exclude": ["node_modules"],

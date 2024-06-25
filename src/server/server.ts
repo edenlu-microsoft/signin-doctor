@@ -4,7 +4,7 @@ import express, { Request, Response } from "express";
 import { diagnoseSignIn } from "./diagnoseSignIn";
 import { getEcomWebConfig } from "./getEcomWebConfig";
 
-const port = 7777;
+const port = 8080;
 const app = express();
 
 app.use(bodyParser.json());

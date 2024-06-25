@@ -13,6 +13,7 @@ import * as React from "react";
 import { EcomConfig } from "./EcomConfig";
 import { EcomConfigView } from "./EcomConfigView";
 import { SignInDiagnoseView } from "./SignInDiagnoseView";
+import { ApiUrl } from "./config";
 
 enum PageTab {
   Config = "Config",
@@ -81,7 +82,7 @@ export default function SearchBar() {
       <Stack horizontal className={styles.searchBar}>
         <input
           type="text"
-          placeholder="e.g. https://ring1test.adventure-works.com"
+          placeholder="e.g. ring1test.adventure-works.com"
           value={searchValue}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setSearchValue(event.target.value || "");
@@ -123,7 +124,7 @@ const analyzeWebConfig = async (
     setLoading(true);
     const ecomConfig: EcomConfig = { url };
     const requestContextData = await axios.get(
-      `http://localhost:7777/ecom-config?ecomUrl=${url}`
+      `${ApiUrl}/ecom-config?ecomUrl=${url}`
     );
 
     const requestContext = requestContextData?.data;

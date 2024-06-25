@@ -14,6 +14,7 @@ import * as React from "react";
 import { CheckItem } from "./CheckItem";
 import { useDoctorState } from "./DoctorStateProvider";
 import { EcomConfig } from "./EcomConfig";
+import { ApiUrl } from "./config";
 
 const SignInDiagnoseLabel = {
   signInPolicy: "Sign In Policy",
@@ -300,7 +301,7 @@ const diagnoseSignInUrl = async (
       pwd,
     };
     const diagnoseResponse = await axios.post(
-      `http://localhost:7777/sign-in-diagnose`,
+      `${ApiUrl}/sign-in-diagnose`,
       body
     );
 

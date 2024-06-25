@@ -3,9 +3,6 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "engines": {
-    "node": ">=16.0.0 <17.0.0"
-  },
   "main": "index.html",
   "scripts": {
     "dev": "vite",
@@ -14,19 +11,6 @@
     "preview": "vite preview",
     "server": "vite-node src/server/server.ts",
     "start": "run-p server dev"
-  },
-  "bin": "./dist/start.js",
-  "pkg": {
-    "scripts": "dist/**/*.js",
-    "assets": [
-      "public/**/*"
-    ],
-    "targets": [
-      "node16-linux-x64",
-      "node16-macos-x64",
-      "node16-win-x64"
-    ],
-    "outputPath": "bin"
   },
   "dependencies": {
     "@fluentui/react": "^8.118.6",

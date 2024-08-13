@@ -84,7 +84,7 @@ export const EcomConfigView = ({
         }}
       >
         {loadingConfig && (
-          <Spinner label={"Loading config..."} size={SpinnerSize.large} />
+          <Spinner label={"Loading config... (5 seconds, take a sip ☕)"} size={SpinnerSize.large} />
         )}
         {!loadingConfig && (
           <Text color={theme.palette.neutralSecondary}>

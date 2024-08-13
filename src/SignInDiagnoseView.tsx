@@ -152,7 +152,7 @@ export const SignInDiagnoseView = ({
       {loading && (
         <Spinner
           label={
-            "Diagnosing Sign-In... (taking 30-60 seconds away from your life)"
+            "Diagnosing Sign-In... (around 15-30 seconds, take a drink 🍹)"
           }
           size={SpinnerSize.large}
         />

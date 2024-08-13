@@ -19,7 +19,6 @@ export const diagnoseAnonymousCSU = async (
 export const diagnoseSigninCSU = async (
   csuEndpoint: string,
   oun: string,
-  channelId: number,
   token: string,
 ) => {
   const customerResponse = await getCustomer(

@@ -387,7 +387,6 @@ const diagnoseSignInUrl = async (
     diagnoseSignInRetailRequest(
       ecomConfig.csuEndpoint,
       ecomConfig.oun,
-      ecomConfig.channelId,
       ecomConfig.url,
       diagnose.token,
       setRetailResponse,
@@ -403,7 +402,6 @@ const diagnoseSignInUrl = async (
 const diagnoseSignInRetailRequest = async (
   csuEndpoint: string,
   oun: string,
-  channelId: number,
   url: string,
   token: string,
   onResult: (result: any) => void,
@@ -414,7 +412,6 @@ const diagnoseSignInRetailRequest = async (
     const diagnoseResult = await diagnoseSigninCSU(
       csuEndpoint,
       oun,
-      channelId,
       token
     );
     onResult(diagnoseResult);

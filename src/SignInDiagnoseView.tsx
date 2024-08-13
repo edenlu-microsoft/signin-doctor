@@ -216,11 +216,12 @@ const SignInDiagnoseResult = ({
             <CheckItem
               label={"Get Customer"}
               value={
-                retailResponse?.getCustomer?.AccountNumber
-                  ? `found customer ${retailResponse.getCustomer.AccountNumber}, isB2B: ${retailResponse.getCustomer.IsB2b},
+                retailResponse?.getCustomer?.Email
+                  ? `found customer AccountNumber:${retailResponse.getCustomer.AccountNumber}, isB2B: ${retailResponse.getCustomer.IsB2b},
                   PartyNumber: ${retailResponse.getCustomer.PartyNumber}, CreditLimit: ${retailResponse.getCustomer.CreditLimit}`
-                  : undefined
+                  : `failed to get customer by token, error detail: ${retailResponse.getCustomer}`
               }
+              isValid={!!retailResponse?.getCustomer?.Email}
             />
           )}
         </>

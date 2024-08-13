@@ -11,10 +11,12 @@ import {
 } from "@fluentui/react";
 import axios from "axios";
 import * as React from "react";
+import { useEffect, useState } from "react";
 import { CheckItem } from "./CheckItem";
 import { useDoctorState } from "./DoctorStateProvider";
 import { EcomConfig } from "./EcomConfig";
 import { ApiUrl } from "./config";
+import { diagnoseSigninCSU } from "./diagnoseCSU";
 
 const SignInDiagnoseLabel = {
   signInPolicy: "Sign In Policy",
@@ -26,6 +28,7 @@ const SignInDiagnoseLabel = {
   retailServerErrorMessage: "Retail Err Msg",
   aud: "Client Id",
   iss: "Issuer",
+  oid: "oid",
   family_name: "Last Name",
   given_name: "First Name",
   token: "Token",
@@ -42,9 +45,11 @@ export const SignInDiagnoseView = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { email, setEmail, pwd, setPwd, signInDiagnose, setSignInDiagnose } =
     useDoctorState();
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingRetail, setLoadingRetail] = useState(false);
+  const [retailResponse, setRetailResponse] = useState<any>();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (signInDiagnose && ecomConfig && ecomConfig.url !== signInDiagnose.url) {
       setSignInDiagnose(undefined);
     }
@@ -53,13 +58,13 @@ export const SignInDiagnoseView = ({
   const handleDiagnose = () => {
     if (ecomConfig && ecomConfig.signInUrl && ecomConfig.signOutUrl) {
       diagnoseSignInUrl(
-        ecomConfig.url,
-        ecomConfig.signInUrl,
-        ecomConfig.signOutUrl,
+        ecomConfig,
         email,
         pwd,
         setSignInDiagnose,
-        setLoading
+        setLoading,
+        setRetailResponse,
+        setLoadingRetail
       );
     }
   };
@@ -138,10 +143,23 @@ export const SignInDiagnoseView = ({
           }
         />
       </Stack>
-      {signInDiagnose && <SignInDiagnoseResult diagnose={signInDiagnose} />}
+      {signInDiagnose && (
+        <SignInDiagnoseResult
+          diagnose={signInDiagnose}
+          retailResponse={retailResponse}
+        />
+      )}
       {loading && (
         <Spinner
-          label={"Diagnosing Sign-In (take 10-20 seconds)..."}
+          label={
+            "Diagnosing Sign-In... (taking 30-60 seconds away from your life)"
+          }
+          size={SpinnerSize.large}
+        />
+      )}
+      {loadingRetail && (
+        <Spinner
+          label={"Calling get customer from CSU..."}
           size={SpinnerSize.large}
         />
       )}
@@ -149,7 +167,13 @@ export const SignInDiagnoseView = ({
   );
 };
 
-const SignInDiagnoseResult = ({ diagnose }: { diagnose: any }) => {
+const SignInDiagnoseResult = ({
+  diagnose,
+  retailResponse,
+}: {
+  diagnose: any;
+  retailResponse: any;
+}) => {
   const token = diagnose.token;
   const tokenPayload = diagnose.tokenPayload;
 
@@ -159,11 +183,6 @@ const SignInDiagnoseResult = ({ diagnose }: { diagnose: any }) => {
   return (
     <Stack tokens={{ childrenGap: 5 }}>
       <CheckItem
-        label={SignInDiagnoseLabel.signInStatus}
-        value={diagnose.signInSucceed ? "Succeed" : "Failed"}
-        isValid={!!diagnose.signInSucceed}
-      />
-      <CheckItem
         label={SignInDiagnoseLabel.signInClientId}
         value={diagnose.signInClientId}
       />
@@ -171,31 +190,10 @@ const SignInDiagnoseResult = ({ diagnose }: { diagnose: any }) => {
         label={SignInDiagnoseLabel.signInPolicy}
         value={diagnose.signInPolicy}
       />
-      {diagnose.error && (
-        <CheckItem
-          label={SignInDiagnoseLabel.error}
-          value={diagnose.error}
-          isValid={!diagnose.error}
-        />
-      )}
-      {diagnose.retailServerErrorCode && (
-        <CheckItem
-          label={SignInDiagnoseLabel.retailServerErrorCode}
-          value={diagnose.retailServerErrorCode}
-          isValid={!diagnose.retailServerErrorCode}
-        />
-      )}
-      {diagnose.retailServerErrorMessage && (
-        <CheckItem
-          label={SignInDiagnoseLabel.retailServerErrorMessage}
-          value={diagnose.retailServerErrorMessage}
-          isValid={!diagnose.retailServerErrorMessage}
-        />
-      )}
-      {diagnose.time && <TimeItem diagnose={diagnose} />}
       {tokenPayload && (
         <>
           <CheckItem label={SignInDiagnoseLabel.iss} value={tokenPayload.iss} />
+          <CheckItem label={SignInDiagnoseLabel.oid} value={tokenPayload.oid} />
           <CheckItem
             label={"Email"}
             value={tokenPayload?.emails?.join(", ")}
@@ -214,8 +212,41 @@ const SignInDiagnoseResult = ({ diagnose }: { diagnose: any }) => {
           />
           <CheckItem label={SignInDiagnoseLabel.token} value={token} />
           {/* <CheckItem label={"Token Payload"} value={tokenPayload} /> */}
+          {retailResponse?.getCustomer && (
+            <CheckItem
+              label={"Get Customer"}
+              value={
+                retailResponse?.getCustomer?.AccountNumber
+                  ? `found customer ${retailResponse.getCustomer.AccountNumber}, isB2B: ${retailResponse.getCustomer.IsB2b},
+                  PartyNumber: ${retailResponse.getCustomer.PartyNumber}, CreditLimit: ${retailResponse.getCustomer.CreditLimit}`
+                  : undefined
+              }
+            />
+          )}
         </>
       )}
+      {diagnose.retailServerErrorCode && (
+        <CheckItem
+          label={SignInDiagnoseLabel.retailServerErrorCode}
+          value={diagnose.retailServerErrorCode}
+          isValid={!diagnose.retailServerErrorCode}
+        />
+      )}
+      {diagnose.retailServerErrorMessage && (
+        <CheckItem
+          label={SignInDiagnoseLabel.retailServerErrorMessage}
+          value={diagnose.retailServerErrorMessage}
+          isValid={!diagnose.retailServerErrorMessage}
+        />
+      )}
+      {diagnose.error && (
+        <CheckItem
+          label={SignInDiagnoseLabel.error}
+          value={diagnose.error}
+          isValid={!diagnose.error}
+        />
+      )}
+      {diagnose.time && <TimeItem diagnose={diagnose} />}
       {(azureSuggestion || retailSuggestion) && (
         <Stack horizontal>
           <Icon iconName="Lightbulb" />
@@ -231,6 +262,41 @@ const SignInDiagnoseResult = ({ diagnose }: { diagnose: any }) => {
           )}
         </Stack>
       )}
+    </Stack>
+  );
+};
+
+const TimeItem = ({ diagnose }: { diagnose: any }) => {
+  const theme = useTheme();
+
+  return (
+    <Stack
+      horizontal
+      verticalAlign="center"
+      tokens={{ childrenGap: 10 }}
+      style={{ width: "100%", maxWidth: 1200 }}
+    >
+      <Icon iconName={"AlarmClock"} />
+      <Stack
+        horizontal
+        verticalAlign="center"
+        tokens={{ childrenGap: 10 }}
+        style={{
+          display: "flex",
+          flex: 1,
+          alignItems: "center",
+          backgroundColor: "white",
+          borderRadius: theme.effects.roundedCorner6,
+          boxShadow: theme.effects.elevation8,
+          padding: "0 10px",
+        }}
+      >
+        <Text style={{ fontWeight: "bold", width: 100, textAlign: "start" }}>
+          Time
+        </Text>
+        <Separator vertical />
+        <Text style={{ wordBreak: "break-all" }}>{diagnose.time} seconds</Text>
+      </Stack>
     </Stack>
   );
 };
@@ -283,20 +349,29 @@ const getAzureSuggestion = (diagnose: any) => {
 };
 
 const diagnoseSignInUrl = async (
-  url: string,
-  signInUrl: string,
-  signOutUrl: string,
+  ecomConfig: EcomConfig,
   email: string,
   pwd: string,
-  onResult: (result: any) => void,
-  setLoading: (loading: boolean) => void
+  setSignInDiagnose: (result: any) => void,
+  setLoading: (loading: boolean) => void,
+  setRetailResponse: (result: any) => void,
+  setRetailLoading: (loading: boolean) => void
 ) => {
+  if (
+    !ecomConfig ||
+    !ecomConfig.oun ||
+    !ecomConfig.channelId ||
+    !ecomConfig.csuEndpoint
+  ) {
+    return;
+  }
+
   try {
     setLoading(true);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const body = {
-      signInUrl,
-      signOutUrl,
+      signInUrl: ecomConfig.signInUrl,
+      signOutUrl: ecomConfig.signOutUrl,
       email,
       pwd,
     };
@@ -307,7 +382,17 @@ const diagnoseSignInUrl = async (
 
     const diagnose = diagnoseResponse?.data;
 
-    onResult({ ...diagnose, url });
+    setSignInDiagnose({ ...diagnose, url: ecomConfig.url });
+
+    diagnoseSignInRetailRequest(
+      ecomConfig.csuEndpoint,
+      ecomConfig.oun,
+      ecomConfig.channelId,
+      ecomConfig.url,
+      diagnose.token,
+      setRetailResponse,
+      setRetailLoading
+    );
   } catch (e) {
     console.log(e);
   } finally {
@@ -315,37 +400,28 @@ const diagnoseSignInUrl = async (
   }
 };
 
-const TimeItem = ({ diagnose }: { diagnose: any }) => {
-  const theme = useTheme();
-
-  return (
-    <Stack
-      horizontal
-      verticalAlign="center"
-      tokens={{ childrenGap: 10 }}
-      style={{ width: "100%", maxWidth: 1200 }}
-    >
-      <Icon iconName={"AlarmClock"} />
-      <Stack
-        horizontal
-        verticalAlign="center"
-        tokens={{ childrenGap: 10 }}
-        style={{
-          display: "flex",
-          flex: 1,
-          alignItems: "center",
-          backgroundColor: "white",
-          borderRadius: theme.effects.roundedCorner6,
-          boxShadow: theme.effects.elevation8,
-          padding: "0 10px",
-        }}
-      >
-        <Text style={{ fontWeight: "bold", width: 100, textAlign: "start" }}>
-          Time
-        </Text>
-        <Separator vertical />
-        <Text style={{ wordBreak: "break-all" }}>{diagnose.time} seconds</Text>
-      </Stack>
-    </Stack>
-  );
+const diagnoseSignInRetailRequest = async (
+  csuEndpoint: string,
+  oun: string,
+  channelId: number,
+  url: string,
+  token: string,
+  onResult: (result: any) => void,
+  setLoading: (loading: boolean) => void
+) => {
+  try {
+    setLoading(true);
+    const diagnoseResult = await diagnoseSigninCSU(
+      csuEndpoint,
+      oun,
+      channelId,
+      token
+    );
+    onResult(diagnoseResult);
+  } catch (e) {
+    console.log(e);
+    onResult({ url });
+  } finally {
+    setLoading(false);
+  }
 };

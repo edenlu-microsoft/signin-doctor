@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import { CheckItem } from "./CheckItem";
 import { EcomConfig } from "./EcomConfig";
-import { diagnoseCSU } from "./diagnoseCSU";
+import { diagnoseAnonymousCSU } from "./diagnoseCSU";
 
 const EcomConfigLabel: { [key: string]: string } = {
   csuEndpoint: "CSU Endpoint",
@@ -44,6 +44,7 @@ export const EcomConfigView = ({
     const csuEndpoint = ecomConfig?.csuEndpoint;
     const oun = ecomConfig?.oun;
     const channelId = ecomConfig?.channelId;
+
     if (
       !loadingConfig &&
       !loadingCSU &&
@@ -113,11 +114,11 @@ export const EcomConfigView = ({
             <CheckItem
               label={"SearchByCriteria"}
               value={
-                diagnoseCSU?.searchByCriteria
-                  ? diagnoseCSU.searchByCriteria
-                  : "Succeed"
+                diagnoseCSU?.searchByCriteria?.value
+                  ? `found ${diagnoseCSU.searchByCriteria.value.length} products at search`
+                  : diagnoseCSU?.searchByCriteria
               }
-              isValid={!diagnoseCSU?.searchByCriteria}
+              isValid={diagnoseCSU?.searchByCriteria}
             />
           }
         </>
@@ -165,7 +166,7 @@ const diagnoseCSURequest = async (
 ) => {
   try {
     setLoading(true);
-    const diagnoseResult = await diagnoseCSU(csuEndpoint, oun, channelId);
+    const diagnoseResult = await diagnoseAnonymousCSU(csuEndpoint, oun, channelId);
     onResult({ ...diagnoseResult, url });
   } catch (e) {
     console.log(e);

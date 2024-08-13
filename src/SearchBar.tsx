@@ -123,8 +123,9 @@ const analyzeWebConfig = async (
   try {
     setLoading(true);
     const ecomConfig: EcomConfig = { url };
+    const formattedUrl = formatUrl(url);
     const requestContextData = await axios.get(
-      `${ApiUrl}/ecom-config?ecomUrl=${url}`
+      `${ApiUrl}/ecom-config?ecomUrl=${formattedUrl}`
     );
 
     const requestContext = requestContextData?.data;
@@ -137,9 +138,7 @@ const analyzeWebConfig = async (
       ecomConfig.channelCustomerType = apiSettings?.channelCustomerType;
 
       const user = requestContext.user;
-      if (user?.signInUrl) {
-        ecomConfig.signInUrl = `${user.signInUrl}?ru=${url}`;
-      }
+      ecomConfig.signInUrl = `${user.signInUrl}?ru=${formattedUrl}`;
       ecomConfig.signOutUrl = user?.signOutUrl;
     }
 
@@ -150,3 +149,11 @@ const analyzeWebConfig = async (
     setLoading(false);
   }
 };
+
+const formatUrl = (url:string) => {
+  if (!url.includes('https://')) {
+    return `https://${url}`
+  }
+
+  return url;
+}

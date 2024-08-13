@@ -1,5 +1,5 @@
 ## React + TypeScript + Vite
-debug locally run npm run dev
+debug locally run `npm run dev`
 
 ## Deployment
 ```

@@ -151,15 +151,15 @@ export const SignInDiagnoseView = ({
       )}
       {loading && (
         <Spinner
-          label={
-            "Diagnosing Sign-In... (around 15-30 seconds, take a drink 🍹)"
-          }
+          label={"Diagnosing Sign-In... (15-30 seconds grab a drink🍺)"}
+          styles={{ label: { fontSize: 16 } }}
           size={SpinnerSize.large}
         />
       )}
       {loadingRetail && (
         <Spinner
           label={"Calling get customer from CSU..."}
+          styles={{ label: { fontSize: 16 } }}
           size={SpinnerSize.large}
         />
       )}
@@ -410,11 +410,7 @@ const diagnoseSignInRetailRequest = async (
 ) => {
   try {
     setLoading(true);
-    const diagnoseResult = await diagnoseSigninCSU(
-      csuEndpoint,
-      oun,
-      token
-    );
+    const diagnoseResult = await diagnoseSigninCSU(csuEndpoint, oun, token);
     onResult(diagnoseResult);
   } catch (e) {
     console.log(e);

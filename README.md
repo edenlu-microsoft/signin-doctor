@@ -1,11 +1,28 @@
 ## React + TypeScript + Vite
+
 debug locally run `npm run dev`
 
 ## Deployment
+
+Build image:
+
 ```
+docker login
+docker build -t signin-doctor:1.0 .
+
+```
+
+testing locally:
+
+```
+docker run -p 8080:8080 signin-doctor:1.0
+```
+
+once things are working, may do the deployment:
+
+```
+docker tag signin-doctor:1.0 edencontainer.azurecr.io/signin-doctor:1.0
 az login
-az account set --subscription "D365_Commerce_Rendering_Corp_NonProd"
-az webapp deployment user set --user-name edenlu --password 123456
-az webapp deployment source config-local-git --name signin-doctor --resource-group rg-ecommerce-global
-git push https://signin-doctor.scm.azurewebsites.net:443/signin-doctor.git master
+az acr login --name edencontainer
+docker push edencontainer.azurecr.io/signin-doctor:1.0
 ```

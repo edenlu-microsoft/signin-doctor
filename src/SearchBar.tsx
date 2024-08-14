@@ -100,10 +100,10 @@ export default function SearchBar() {
       </Stack>
       <Stack styles={{ root: { marginTop: 20, width: "100%" } }}>
         <Pivot selectedKey={tab} onLinkClick={handleTabChange}>
-          <PivotItem headerText="Ecom config" itemKey={PageTab.Config}>
+          <PivotItem headerText="Site-Config" itemKey={PageTab.Config}>
             <EcomConfigView ecomConfig={ecomConfig} loadingConfig={isLoading} />
           </PivotItem>
-          <PivotItem headerText="Sign In" itemKey={PageTab.SignIn}>
+          <PivotItem headerText="Sign-In" itemKey={PageTab.SignIn}>
             <SignInDiagnoseView
               ecomConfig={ecomConfig}
               loadingConfig={isLoading}
@@ -150,10 +150,10 @@ const analyzeWebConfig = async (
   }
 };
 
-const formatUrl = (url:string) => {
-  if (!url.includes('https://')) {
-    return `https://${url}`
+const formatUrl = (url: string) => {
+  if (!url.includes("https://")) {
+    return `https://${url}`;
   }
 
   return url;
-}
+};

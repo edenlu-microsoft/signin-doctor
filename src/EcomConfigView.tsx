@@ -84,10 +84,14 @@ export const EcomConfigView = ({
         }}
       >
         {loadingConfig && (
-          <Spinner label={"Loading config... (5 seconds, take a sip ☕)"} size={SpinnerSize.large} />
+          <Spinner
+            label={"Loading config... (5-10 seconds take a sip ☕)"}
+            size={SpinnerSize.large}
+            styles={{ label: { fontSize: 16 } }}
+          />
         )}
         {!loadingConfig && (
-          <Text color={theme.palette.neutralSecondary}>
+          <Text color={theme.palette.neutralSecondary} style={{ fontSize: 16 }}>
             Enter url to start diagnose
           </Text>
         )}
@@ -106,7 +110,11 @@ export const EcomConfigView = ({
       })}
 
       {loadingCSU && (
-        <Spinner label={"Loading CSU calls..."} size={SpinnerSize.large} />
+        <Spinner
+          label={"Loading CSU calls..."}
+          size={SpinnerSize.large}
+          styles={{ label: { fontSize: 16 } }}
+        />
       )}
       {!loadingCSU && diagnoseCSU && (
         <>
@@ -166,7 +174,11 @@ const diagnoseCSURequest = async (
 ) => {
   try {
     setLoading(true);
-    const diagnoseResult = await diagnoseAnonymousCSU(csuEndpoint, oun, channelId);
+    const diagnoseResult = await diagnoseAnonymousCSU(
+      csuEndpoint,
+      oun,
+      channelId
+    );
     onResult({ ...diagnoseResult, url });
   } catch (e) {
     console.log(e);

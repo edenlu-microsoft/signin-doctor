@@ -19,13 +19,9 @@ export const diagnoseAnonymousCSU = async (
 export const diagnoseSigninCSU = async (
   csuEndpoint: string,
   oun: string,
-  token: string,
+  token: string
 ) => {
-  const customerResponse = await getCustomer(
-    csuEndpoint,
-    oun,
-    token
-  );
+  const customerResponse = await getCustomer(csuEndpoint, oun, token);
 
   // todo, may do some cart check
   return {
@@ -48,23 +44,19 @@ const sendSearchByCriteria = async (
       SkipVariantExpansion: true,
     },
   };
-  const body ={
+  const body = {
     method: "POST",
-    endpoint:`${csuEndpoint}Commerce/Products/SearchByCriteria?$top=20&$count=true&api-version=7.3`,
-    body:requestBody,
+    endpoint: `${csuEndpoint}Commerce/Products/SearchByCriteria?$top=20&$count=true&api-version=7.3`,
+    body: requestBody,
     headers: {
       "Content-Type": "application/json",
       OUN: oun,
       "accept-language": "en-us",
-    }
-  }
-
+    },
+  };
 
   try {
-    const response = await axios.post(
-      `${ApiUrl}/csu`,
-      body
-    );
+    const response = await axios.post(`${ApiUrl}/csu`, body);
 
     // return error message
     if (response.status === 200) {
@@ -73,35 +65,28 @@ const sendSearchByCriteria = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("Axios error:", error.response);
-      return error.response;
+      return error?.response?.data;
     } else {
       console.error("Unexpected error:", error);
-      return error;
+      return undefined;
     }
   }
 };
 
-const getCustomer = async (
-  csuEndpoint: string,
-  oun: string,
-  token: string
-) => {
+const getCustomer = async (csuEndpoint: string, oun: string, token: string) => {
   try {
-    const body ={
+    const body = {
       method: "GET",
-      endpoint:`${csuEndpoint}Commerce/Customers('')?api-version=7.3`,
+      endpoint: `${csuEndpoint}Commerce/Customers('')?api-version=7.3`,
       headers: {
         "Content-Type": "application/json",
         OUN: oun,
         "accept-language": "en-us",
-        "Authorization": `id_token ${token}`
+        Authorization: `id_token ${token}`,
       },
-    }
+    };
 
-    const response = await axios.post(
-      `${ApiUrl}/csu`,
-      body
-    );
+    const response = await axios.post(`${ApiUrl}/csu`, body);
 
     // return error message
     if (response.status === 200) {
@@ -110,10 +95,10 @@ const getCustomer = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("Axios error:", error.response);
-      return error.response;
+      return error?.response?.data;
     } else {
       console.error("Unexpected error:", error);
-      return error;
+      return undefined;
     }
   }
 };

@@ -178,7 +178,7 @@ const SignInDiagnoseResult = ({
   const tokenPayload = diagnose.tokenPayload;
 
   const azureSuggestion = getAzureSuggestion(diagnose);
-  const retailSuggestion = getRetailSuggestion(diagnose);
+  const retailSuggestion = getRetailSuggestion(diagnose, retailResponse);
 
   return (
     <Stack tokens={{ childrenGap: 5 }}>
@@ -219,7 +219,9 @@ const SignInDiagnoseResult = ({
                 retailResponse?.getCustomer?.Email
                   ? `found customer AccountNumber:${retailResponse.getCustomer.AccountNumber}, isB2B: ${retailResponse.getCustomer.IsB2b},
                   PartyNumber: ${retailResponse.getCustomer.PartyNumber}, CreditLimit: ${retailResponse.getCustomer.CreditLimit}`
-                  : `failed to get customer by token, error detail: ${retailResponse.getCustomer}`
+                  : `failed to get customer by token, error detail: ${JSON.stringify(
+                      retailResponse.getCustomer
+                    )}`
               }
               isValid={!!retailResponse?.getCustomer?.Email}
             />
@@ -302,8 +304,13 @@ const TimeItem = ({ diagnose }: { diagnose: any }) => {
   );
 };
 
-const getRetailSuggestion = (diagnose: any) => {
-  const retailServerErrorCode: string = diagnose.retailServerErrorCode;
+const getRetailSuggestion = (diagnose: any, retailResponse: any) => {
+  const retailServerException = retailResponse?.getCustomer?.Exception;
+  const retailServerExceptionDetail = retailServerException
+    ? JSON.parse(retailServerException)
+    : undefined;
+  const retailServerErrorCode: string =
+    retailServerExceptionDetail?.ErrorResourceId;
   const tokenPayload = diagnose.tokenPayload;
   const iss = tokenPayload?.iss;
   const aud = tokenPayload?.aud;
@@ -311,9 +318,12 @@ const getRetailSuggestion = (diagnose: any) => {
   let suggestion = "";
 
   if (
-    retailServerErrorCode?.includes(
+    (retailServerErrorCode?.includes(
       "Microsoft_Dynamics_Commerce_Runtime_InvalidAudience"
-    ) &&
+    ) ||
+      retailServerErrorCode?.includes(
+        "Microsoft_Dynamics_Commerce_Runtime_InvalidIssuer"
+      )) &&
     iss &&
     aud
   ) {

@@ -124,9 +124,9 @@ export const EcomConfigView = ({
               value={
                 diagnoseCSU?.searchByCriteria?.value
                   ? `found ${diagnoseCSU.searchByCriteria.value.length} products at search`
-                  : diagnoseCSU?.searchByCriteria
+                  : JSON.stringify(diagnoseCSU?.searchByCriteria)
               }
-              isValid={diagnoseCSU?.searchByCriteria}
+              isValid={!!diagnoseCSU?.searchByCriteria?.value}
             />
           }
         </>

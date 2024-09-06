@@ -18,11 +18,19 @@ testing locally:
 docker run -p 8080:8080 signin-doctor:1.0
 ```
 
-once things are working, may do the deployment:
+once things are working, may do the deployment below
 
 ```
-docker tag signin-doctor:1.0 edencontainer.azurecr.io/signin-doctor:1.0
 az login
 az acr login --name edencontainer
+docker tag signin-doctor:1.0 edencontainer.azurecr.io/signin-doctor:1.0
 docker push edencontainer.azurecr.io/signin-doctor:1.0
 ```
+
+if seeing below error
+
+```
+open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+```
+
+it means the docker is not opened, start your Docker app and run it again
